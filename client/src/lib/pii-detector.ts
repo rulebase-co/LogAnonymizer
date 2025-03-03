@@ -22,43 +22,44 @@ const MASK_CHARS: Record<PiiType, string> = {
 
 export function detectPii(text: string): Record<PiiType, string[]> {
   const results: Partial<Record<PiiType, string[]>> = {};
-  
+
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     const matches = text.match(pattern) || [];
     if (matches.length > 0) {
-      results[type as PiiType] = [...new Set(matches)];
+      results[type as PiiType] = Array.from(new Set(matches));
     }
   });
-  
+
   return results as Record<PiiType, string[]>;
 }
 
 export function anonymizeText(text: string, enabledTypes: Record<string, boolean>): string {
   let anonymized = text;
-  
+
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     if (enabledTypes[type]) {
       anonymized = anonymized.replace(pattern, MASK_CHARS[type as PiiType]);
     }
   });
-  
+
   return anonymized;
 }
 
 export function highlightPii(text: string, enabledTypes: Record<string, boolean>): string {
   let highlighted = text;
   const matches = detectPii(text);
-  
+
   Object.entries(matches).forEach(([type, values]) => {
     if (enabledTypes[type]) {
       values.forEach(value => {
+        const colorClass = `bg-yellow-400/30 text-yellow-100 dark:text-yellow-200 px-1 rounded`;
         highlighted = highlighted.replace(
           new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-          `<mark class="bg-yellow-500/20 text-yellow-200">${value}</mark>`
+          `<mark class="${colorClass}" title="Detected ${type}">${value}</mark>`
         );
       });
     }
   });
-  
+
   return highlighted;
 }
