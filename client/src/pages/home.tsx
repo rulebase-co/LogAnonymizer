@@ -132,14 +132,18 @@ export default function Home() {
           <div className="space-y-1">
             <h1 className="text-2xl font-bold">Log Anonymizer</h1>
             <p className="text-sm text-muted-foreground">
-              <a 
-                href="https://github.com/your-username/log-anonymizer#readme" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
+              Currently using: {providerConfig.apiKey ? "AI-Enhanced Detection" : "Local Regex Detection"}
+              <button 
+                className="ml-2 text-primary hover:underline"
+                onClick={() => {
+                  toast({
+                    title: "PII Detection Modes",
+                    description: "The app uses regex patterns by default for local processing. Add an OpenAI API key to enable AI-enhanced detection for more complex patterns.",
+                  });
+                }}
               >
-                View Documentation
-              </a>
+                Learn More
+              </button>
             </p>
           </div>
           <div className="flex gap-2">
@@ -168,8 +172,11 @@ export default function Home() {
           {/* Left Settings Panel */}
           <div className="col-span-12 lg:col-span-3 space-y-6">
             <Card className="p-4">
-              <h2 className="text-lg font-semibold mb-4">AI Provider</h2>
+              <h2 className="text-lg font-semibold mb-4">AI Provider (Optional)</h2>
               <div className="space-y-4">
+                <div className="text-sm text-muted-foreground mb-4">
+                  Enable AI-enhanced detection for more sophisticated PII recognition. The app works without this using local regex patterns.
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Provider</label>
                   <Select
