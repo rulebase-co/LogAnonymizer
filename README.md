@@ -41,72 +41,192 @@ For more sophisticated detection:
    - Context-aware PII detection
    - Custom entity recognition
 
-## Quick Deploy on Replit
+## Deployment Guide
 
-1. Click the "Fork" button at the top of this Repl
-2. The application will automatically start after forking
-3. Access your app at your-repl-name.your-username.repl.co
+### Prerequisites
+- Node.js 18.x or higher
+- npm or yarn package manager
+- 512MB RAM minimum
+- Basic knowledge of command line operations
 
-## Local Development
+### 1. Local Development Setup
 
-1. Clone the repository
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/log-anonymizer
+cd log-anonymizer
+```
+
 2. Install dependencies:
 ```bash
 npm install
 ```
-3. Start the development server:
+
+3. Create environment file:
+```bash
+cp .env.example .env
+```
+
+4. Start development server:
 ```bash
 npm run dev
 ```
-4. Open http://localhost:5000 in your browser
 
-## Environment Variables
+5. Access at http://localhost:5000
 
-The application works without any environment variables using local regex-based processing.
+### 2. Production Deployment Options
 
-Optional AI Enhancement:
-- `OPENAI_API_KEY`: Enable AI-powered PII detection (optional)
-
-## How PII Detection Works
-
-### Regex Patterns
-The application uses carefully crafted regex patterns to identify sensitive information:
-
-- Timestamps: `\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}`
-- Email addresses: `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`
-- Phone numbers: `\b(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b`
-- And more...
-
-### Special Cases
-The regex engine is designed to:
-1. Preserve agent information (names and IDs)
-2. Keep specific user ID formats intact
-3. Replace addresses with fictional alternatives
-4. Maintain document structure and readability
-
-## Deployment Options
-
-### 1. Deploy on Replit (Recommended)
-- Fork this Repl
-- Your app will be automatically deployed
-- Updates are automatically deployed when you make changes
-
-### 2. Deploy as Static Site
-Since the core anonymization happens client-side, you can deploy the built assets from `dist/public` to any static hosting service:
+#### A. Static Site (Recommended)
+Since the core anonymization happens client-side, you can deploy to any static host:
 
 1. Build the application:
 ```bash
 npm run build
 ```
-2. Deploy the contents of `dist/public` to any static host
 
-### 3. Deploy on Your Own Server
+2. Deploy `dist/public` to:
+   - Netlify
+   - Vercel
+   - GitHub Pages
+   - Any static file host
+
+#### B. Full-Stack Deployment
+For organizations requiring server-side features:
+
 1. Build the application:
 ```bash
 npm run build
 ```
-2. Start the production server:
+
+2. Configure environment:
+```bash
+# Required
+PORT=5000
+NODE_ENV=production
+
+# Optional for AI features
+OPENAI_API_KEY=your_key_here
+```
+
+3. Start production server:
 ```bash
 npm start
 ```
-3. Access on port 5000
+
+#### C. Docker Deployment
+1. Build the image:
+```bash
+docker build -t log-anonymizer .
+```
+
+2. Run container:
+```bash
+docker run -p 5000:5000 log-anonymizer
+```
+
+### 3. Cloud Platform Specific Instructions
+
+#### Replit (Easiest)
+1. Fork the Repl
+2. The app automatically deploys
+3. Access at your-repl-name.your-username.repl.co
+
+#### Heroku
+1. Create new app
+2. Connect your repository
+3. Add buildpack: heroku/nodejs
+4. Deploy main branch
+
+#### AWS Elastic Beanstalk
+1. Create new application
+2. Choose Node.js platform
+3. Upload source bundle
+4. Configure environment variables
+
+## Environment Configuration
+
+### Required Environment Variables
+None! The app works out of the box with local processing.
+
+### Optional Environment Variables
+- `OPENAI_API_KEY`: Enable AI-powered detection
+- `PORT`: Override default port (5000)
+- `NODE_ENV`: Set environment (development/production)
+
+## Security Considerations
+
+1. API Keys
+   - Never commit API keys to version control
+   - Use environment variables for sensitive data
+   - Rotate keys regularly if using AI features
+
+2. Data Processing
+   - All PII detection happens client-side
+   - No data is stored or transmitted
+   - No cookies or local storage used
+
+3. Dependencies
+   - Regular security updates via npm audit
+   - Minimal external dependencies
+   - All packages vetted for security
+
+## Troubleshooting
+
+### Common Issues
+
+1. Port Already in Use
+```bash
+# Change port in package.json or use environment variable
+PORT=5001 npm start
+```
+
+2. Missing Dependencies
+```bash
+# Clear npm cache and reinstall
+npm cache clean --force
+npm install
+```
+
+3. Build Errors
+```bash
+# Clean build files and rebuild
+rm -rf dist
+npm run build
+```
+
+## Support & Maintenance
+
+1. Updating Dependencies
+```bash
+npm update
+npm audit fix
+```
+
+2. Monitoring
+- Check application logs
+- Monitor memory usage
+- Watch for API rate limits if using AI features
+
+3. Backup
+- Regular backups of configuration
+- Version control for custom rules
+- Document any modifications
+
+## Performance Optimization
+
+1. Production Build
+- Minified assets
+- Tree-shaking enabled
+- Code splitting active
+
+2. Caching Strategy
+- Static assets cached
+- API responses cached when appropriate
+- Browser caching configured
+
+3. Load Times
+- Lazy loading for large components
+- Image optimization
+- Code splitting for routes
+
+Remember to check the [official documentation](docs/README.md) for detailed information about customization and advanced features.
