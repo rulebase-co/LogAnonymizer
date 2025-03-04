@@ -1,7 +1,7 @@
 import type { PiiType } from "@shared/schema";
 
 // Keep agent name pattern for filtering only, not for redaction
-const AGENT_NAME_PATTERN = /Agent\s+[A-Z][a-z]+/g;
+const AGENT_NAME_PATTERN = /Agent\s*Name:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/g;
 
 const PII_PATTERNS: Record<PiiType, RegExp> = {
   timestamp: /\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}|\w+\s+\d{1,2},\s+\d{4}/g,
@@ -48,7 +48,7 @@ export function detectPii(text: string): Record<PiiType, string[]> {
 
   // Get agent names first to exclude them from customer names
   const agentNames = text.match(AGENT_NAME_PATTERN) || [];
-  const agentNamesSet = new Set(agentNames);
+  const agentNamesSet = new Set(agentNames.map(name => name.replace(/Agent\s*Name:\s*/, '')));
 
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     const matches = text.match(pattern) || [];
@@ -73,7 +73,7 @@ export function anonymizeText(text: string, enabledTypes: Record<string, boolean
 
   // Get agent names first to preserve them
   const agentNames = text.match(AGENT_NAME_PATTERN) || [];
-  const agentNamesSet = new Set(agentNames);
+  const agentNamesSet = new Set(agentNames.map(name => name.replace(/Agent\s*Name:\s*/, '')));
 
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     if (enabledTypes[type]) {
