@@ -48,7 +48,16 @@ export function detectPii(text: string): Record<PiiType, string[]> {
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     const matches = text.match(pattern) || [];
     if (matches.length > 0) {
-      results[type as PiiType] = Array.from(new Set(matches));
+      if (type === 'name') {
+        // Filter out agent names from customer names
+        const agentNames = text.match(PII_PATTERNS.agentName) || [];
+        const customerNames = matches.filter(name => !agentNames.includes(name));
+        if (customerNames.length > 0) {
+          results[type as PiiType] = Array.from(new Set(customerNames));
+        }
+      } else {
+        results[type as PiiType] = Array.from(new Set(matches));
+      }
     }
   });
 
@@ -68,6 +77,15 @@ export function anonymizeText(text: string, enabledTypes: Record<string, boolean
           currentAddressIndex++;
           anonymized = anonymized.replace(match, replacement);
         });
+      } else if (type === 'name') {
+        // Handle customer names separately from agent names
+        const matches = anonymized.match(pattern) || [];
+        const agentNames = anonymized.match(PII_PATTERNS.agentName) || [];
+        matches.forEach(name => {
+          if (!agentNames.includes(name)) {
+            anonymized = anonymized.replace(name, MASK_CHARS[type as PiiType]);
+          }
+        });
       } else {
         anonymized = anonymized.replace(pattern, MASK_CHARS[type as PiiType]);
       }
@@ -84,7 +102,7 @@ export function highlightPii(text: string, enabledTypes: Record<string, boolean>
   Object.entries(matches).forEach(([type, values]) => {
     if (enabledTypes[type]) {
       values.forEach(value => {
-        const colorClass = `bg-yellow-400/30 text-yellow-100 dark:text-yellow-200 px-1 rounded`;
+        const colorClass = `bg-yellow-100 text-yellow-800 dark:bg-yellow-400/30 dark:text-yellow-200 px-1 rounded`;
         highlighted = highlighted.replace(
           new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
           `<mark class="${colorClass}" title="Detected ${type}">${value}</mark>`

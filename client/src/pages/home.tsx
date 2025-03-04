@@ -12,7 +12,7 @@ import {
 import { anonymizeText, highlightPii } from "@/lib/pii-detector";
 import { anonymizeWithAI } from "@/lib/ai-providers";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormControl, FormLabel } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
