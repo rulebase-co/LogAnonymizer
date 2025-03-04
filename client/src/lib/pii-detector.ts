@@ -1,6 +1,9 @@
 import type { PiiType } from "@shared/schema";
 
 const PII_PATTERNS: Record<PiiType, RegExp> = {
+  agentName: /Agent\s+[A-Z][a-z]+/g,
+  timestamp: /\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}|\w+\s+\d{1,2},\s+\d{4}/g,
+  userId: /User ID: \d+|UID: \d+|User#\d+/g,
   email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
   phone: /\b(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
   ip: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
@@ -11,14 +14,33 @@ const PII_PATTERNS: Record<PiiType, RegExp> = {
 };
 
 const MASK_CHARS: Record<PiiType, string> = {
+  agentName: "[AGENT]",
+  timestamp: "[TIMESTAMP]",
+  userId: "[USER_ID]",
   email: "[EMAIL]",
   phone: "[PHONE]",
   ip: "[IP]",
   creditCard: "[CC]",
   ssn: "[SSN]",
   name: "[NAME]",
-  address: "[ADDRESS]"
+  address: "",  // Will be replaced with fictional addresses
 };
+
+// List of fictional addresses to use as replacements
+const FICTIONAL_ADDRESSES = [
+  "221B Baker Street, London",
+  "12 Grimmauld Place, London",
+  "742 Evergreen Terrace, Springfield",
+  "31 Spooner Street, Quahog",
+  "124 Conch Street, Bikini Bottom",
+  "1313 Mockingbird Lane, Mockingbird Heights",
+  "322 Maple Street, Stars Hollow",
+  "4 Privet Drive, Little Whinging",
+  "17 Cherry Tree Lane, London",
+  "84 Rainey Street, Arlen"
+];
+
+let currentAddressIndex = 0;
 
 export function detectPii(text: string): Record<PiiType, string[]> {
   const results: Partial<Record<PiiType, string[]>> = {};
@@ -38,7 +60,17 @@ export function anonymizeText(text: string, enabledTypes: Record<string, boolean
 
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     if (enabledTypes[type]) {
-      anonymized = anonymized.replace(pattern, MASK_CHARS[type as PiiType]);
+      if (type === 'address') {
+        // Replace each address with a unique fictional address
+        const matches = anonymized.match(pattern) || [];
+        matches.forEach(match => {
+          const replacement = FICTIONAL_ADDRESSES[currentAddressIndex % FICTIONAL_ADDRESSES.length];
+          currentAddressIndex++;
+          anonymized = anonymized.replace(match, replacement);
+        });
+      } else {
+        anonymized = anonymized.replace(pattern, MASK_CHARS[type as PiiType]);
+      }
     }
   });
 

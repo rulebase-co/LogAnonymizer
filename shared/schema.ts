@@ -1,13 +1,16 @@
 import { z } from "zod";
 
 export const piiTypes = [
+  { id: "agentName", label: "Agent Names", enabled: true },
+  { id: "timestamp", label: "Timestamps", enabled: true },
+  { id: "userId", label: "User IDs", enabled: true },
   { id: "email", label: "Email Addresses", enabled: true },
   { id: "phone", label: "Phone Numbers", enabled: true },
   { id: "ip", label: "IP Addresses", enabled: true },
   { id: "creditCard", label: "Credit Card Numbers", enabled: true },
   { id: "ssn", label: "Social Security Numbers", enabled: true },
-  { id: "name", label: "Names", enabled: true },
-  { id: "address", label: "Addresses", enabled: true }
+  { id: "name", label: "Customer Names", enabled: true },
+  { id: "address", label: "Addresses (Replace with Fiction)", enabled: true }
 ] as const;
 
 export type PiiType = typeof piiTypes[number]["id"];
