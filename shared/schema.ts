@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const piiTypes = [
-  { id: "agentName", label: "Agent Names", enabled: true },
   { id: "timestamp", label: "Timestamps", enabled: true },
   { id: "userId", label: "User IDs", enabled: true },
   { id: "email", label: "Email Addresses", enabled: true },
