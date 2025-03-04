@@ -48,7 +48,7 @@ For more sophisticated detection:
    - Context-aware PII detection
    - Custom entity recognition
 
-## Try It Out
+## Getting Started
 
 ### Prerequisites
 - Node.js 18.x or higher
@@ -56,12 +56,13 @@ For more sophisticated detection:
 - 512MB RAM minimum
 - Basic knowledge of command line operations
 
-### Quick Start
+### Local Development
 
-1. Clone the repository:
+1. Create a new directory and initialize the project:
 ```bash
-git clone https://github.com/your-username/log-anonymizer
+mkdir log-anonymizer
 cd log-anonymizer
+npm init -y
 ```
 
 2. Install dependencies:
