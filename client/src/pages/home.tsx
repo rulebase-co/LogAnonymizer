@@ -144,6 +144,19 @@ export default function Home() {
               >
                 Learn More
               </button>
+              <span className="mx-2">•</span>
+              <button 
+                className="text-primary hover:underline"
+                onClick={() => {
+                  toast({
+                    title: "Deployment Guide",
+                    description: "Check DEPLOYMENT.md in the project root for detailed instructions on deploying the app in your environment.",
+                    duration: 5000,
+                  });
+                }}
+              >
+                Deployment Guide
+              </button>
             </p>
           </div>
           <div className="flex gap-2">
