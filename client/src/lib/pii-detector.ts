@@ -1,7 +1,9 @@
 import type { PiiType } from "@shared/schema";
 
+// Keep agent name pattern for filtering only, not for redaction
+const AGENT_NAME_PATTERN = /Agent\s+[A-Z][a-z]+/g;
+
 const PII_PATTERNS: Record<PiiType, RegExp> = {
-  agentName: /Agent\s+[A-Z][a-z]+/g,
   timestamp: /\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}|\w+\s+\d{1,2},\s+\d{4}/g,
   userId: /User ID: \d+|UID: \d+|User#\d+/g,
   email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
@@ -14,7 +16,6 @@ const PII_PATTERNS: Record<PiiType, RegExp> = {
 };
 
 const MASK_CHARS: Record<PiiType, string> = {
-  agentName: "[AGENT]",
   timestamp: "[TIMESTAMP]",
   userId: "[USER_ID]",
   email: "[EMAIL]",
@@ -45,13 +46,16 @@ let currentAddressIndex = 0;
 export function detectPii(text: string): Record<PiiType, string[]> {
   const results: Partial<Record<PiiType, string[]>> = {};
 
+  // Get agent names first to exclude them from customer names
+  const agentNames = text.match(AGENT_NAME_PATTERN) || [];
+  const agentNamesSet = new Set(agentNames);
+
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     const matches = text.match(pattern) || [];
     if (matches.length > 0) {
       if (type === 'name') {
         // Filter out agent names from customer names
-        const agentNames = text.match(PII_PATTERNS.agentName) || [];
-        const customerNames = matches.filter(name => !agentNames.includes(name));
+        const customerNames = matches.filter(name => !agentNamesSet.has(name));
         if (customerNames.length > 0) {
           results[type as PiiType] = Array.from(new Set(customerNames));
         }
@@ -67,6 +71,10 @@ export function detectPii(text: string): Record<PiiType, string[]> {
 export function anonymizeText(text: string, enabledTypes: Record<string, boolean>): string {
   let anonymized = text;
 
+  // Get agent names first to preserve them
+  const agentNames = text.match(AGENT_NAME_PATTERN) || [];
+  const agentNamesSet = new Set(agentNames);
+
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     if (enabledTypes[type]) {
       if (type === 'address') {
@@ -78,11 +86,10 @@ export function anonymizeText(text: string, enabledTypes: Record<string, boolean
           anonymized = anonymized.replace(match, replacement);
         });
       } else if (type === 'name') {
-        // Handle customer names separately from agent names
+        // Only anonymize customer names, preserve agent names
         const matches = anonymized.match(pattern) || [];
-        const agentNames = anonymized.match(PII_PATTERNS.agentName) || [];
         matches.forEach(name => {
-          if (!agentNames.includes(name)) {
+          if (!agentNamesSet.has(name)) {
             anonymized = anonymized.replace(name, MASK_CHARS[type as PiiType]);
           }
         });
