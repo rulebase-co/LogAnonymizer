@@ -1,7 +1,7 @@
 import type { PiiType } from "@shared/schema";
 
-// Keep agent name pattern for filtering only, not for redaction
-const AGENT_NAME_PATTERN = /Agent\s*Name:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/g;
+// Pattern to identify agent-related text (for exclusion only)
+const AGENT_TEXT_PATTERN = /Agent(?:\s*Name)?:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/g;
 
 const PII_PATTERNS: Record<PiiType, RegExp> = {
   timestamp: /\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}|\w+\s+\d{1,2},\s+\d{4}/g,
@@ -43,23 +43,36 @@ const FICTIONAL_ADDRESSES = [
 
 let currentAddressIndex = 0;
 
+// Helper function to get text positions of all agent-related content
+function getAgentTextPositions(text: string): Array<[number, number]> {
+  const positions: Array<[number, number]> = [];
+  let match;
+  while ((match = AGENT_TEXT_PATTERN.exec(text)) !== null) {
+    positions.push([match.index, match.index + match[0].length]);
+  }
+  return positions;
+}
+
+// Helper function to check if a position is within any agent text
+function isWithinAgentText(position: number, agentPositions: Array<[number, number]>): boolean {
+  return agentPositions.some(([start, end]) => position >= start && position <= end);
+}
+
 export function detectPii(text: string): Record<PiiType, string[]> {
   const results: Partial<Record<PiiType, string[]>> = {};
-
-  // Get agent names first to exclude them from customer names
-  const agentNames = text.match(AGENT_NAME_PATTERN) || [];
-  const agentNamesSet = new Set(agentNames.map(name => name.replace(/Agent\s*Name:\s*/, '')));
+  const agentPositions = getAgentTextPositions(text);
 
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
-    const matches = text.match(pattern) || [];
+    let matches = text.match(pattern) || [];
     if (matches.length > 0) {
+      // For names, filter out any that are part of agent text
       if (type === 'name') {
-        // Filter out agent names from customer names
-        const customerNames = matches.filter(name => !agentNamesSet.has(name));
-        if (customerNames.length > 0) {
-          results[type as PiiType] = Array.from(new Set(customerNames));
-        }
-      } else {
+        matches = matches.filter(match => {
+          const matchIndex = text.indexOf(match);
+          return !isWithinAgentText(matchIndex, agentPositions);
+        });
+      }
+      if (matches.length > 0) {
         results[type as PiiType] = Array.from(new Set(matches));
       }
     }
@@ -70,10 +83,7 @@ export function detectPii(text: string): Record<PiiType, string[]> {
 
 export function anonymizeText(text: string, enabledTypes: Record<string, boolean>): string {
   let anonymized = text;
-
-  // Get agent names first to preserve them
-  const agentNames = text.match(AGENT_NAME_PATTERN) || [];
-  const agentNamesSet = new Set(agentNames.map(name => name.replace(/Agent\s*Name:\s*/, '')));
+  const agentPositions = getAgentTextPositions(text);
 
   Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
     if (enabledTypes[type]) {
@@ -86,13 +96,18 @@ export function anonymizeText(text: string, enabledTypes: Record<string, boolean
           anonymized = anonymized.replace(match, replacement);
         });
       } else if (type === 'name') {
-        // Only anonymize customer names, preserve agent names
-        const matches = anonymized.match(pattern) || [];
-        matches.forEach(name => {
-          if (!agentNamesSet.has(name)) {
-            anonymized = anonymized.replace(name, MASK_CHARS[type as PiiType]);
+        // Only anonymize non-agent names
+        let match;
+        const regex = new RegExp(pattern);
+        while ((match = regex.exec(anonymized)) !== null) {
+          if (!isWithinAgentText(match.index, agentPositions)) {
+            const replacement = MASK_CHARS[type];
+            anonymized = 
+              anonymized.slice(0, match.index) + 
+              replacement + 
+              anonymized.slice(match.index + match[0].length);
           }
-        });
+        }
       } else {
         anonymized = anonymized.replace(pattern, MASK_CHARS[type as PiiType]);
       }
