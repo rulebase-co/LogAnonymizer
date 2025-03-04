@@ -1,7 +1,7 @@
 import type { PiiType } from "@shared/schema";
 
 // Pattern to identify agent-related text (for exclusion only)
-const AGENT_TEXT_PATTERN = /Agent(?:\s*Name)?:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/g;
+const AGENT_TEXT_PATTERN = /(?:Agent(?:\s*Name)?:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|ID:\s*AGT-\d+)/g;
 
 const PII_PATTERNS: Record<PiiType, RegExp> = {
   timestamp: /\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}|\w+\s+\d{1,2},\s+\d{4}/g,
