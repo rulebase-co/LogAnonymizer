@@ -2,13 +2,8 @@
 
 ## Quick Start Options
 
-### 1. Deploy on Replit (Recommended)
-The fastest way to get started:
-1. Fork this Repl
-2. The app automatically deploys
-3. Access at your-repl-name.your-username.repl.co
 
-### 2. Local Development
+### 1. Local Development
 ```bash
 # Clone the repository
 git clone <repository-url>

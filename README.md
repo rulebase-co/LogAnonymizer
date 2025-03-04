@@ -1,6 +1,13 @@
-# Log Anonymizer
+# Log Anonymizer 🔒
 
-A secure log anonymization tool that protects sensitive information while preserving critical context. This application provides granular PII detection and selective anonymization with local processing and an intuitive interface.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+
+A secure, flexible log anonymization tool that protects sensitive information while preserving critical context. This application provides granular PII detection and selective anonymization with local processing and an intuitive interface.
+
+<p align="center">
+  <img src="./screenshots/demo.png" alt="Log Anonymizer Demo" width="800"/>
+</p>
 
 ## Features
 
@@ -41,7 +48,7 @@ For more sophisticated detection:
    - Context-aware PII detection
    - Custom entity recognition
 
-## Deployment Guide
+## Try It Out
 
 ### Prerequisites
 - Node.js 18.x or higher
@@ -49,7 +56,7 @@ For more sophisticated detection:
 - 512MB RAM minimum
 - Basic knowledge of command line operations
 
-### 1. Local Development Setup
+### Quick Start
 
 1. Clone the repository:
 ```bash
@@ -74,84 +81,30 @@ npm run dev
 
 5. Access at http://localhost:5000
 
-### 2. Production Deployment Options
+## Deployment Options
 
-#### A. Static Site (Recommended)
-Since the core anonymization happens client-side, you can deploy to any static host:
+### Local Development
+Detailed instructions for local development can be found in [DEPLOYMENT.md](DEPLOYMENT.md#local-development).
 
-1. Build the application:
-```bash
-npm run build
-```
+### Production Deployment
+For production deployment options, including:
+- Static site deployment
+- Full-stack server setup
+- Docker deployment
+- Cloud platform deployment
 
-2. Deploy `dist/public` to:
-   - Netlify
-   - Vercel
-   - GitHub Pages
-   - Any static file host
+See [DEPLOYMENT.md](DEPLOYMENT.md#production-deployment-options).
 
-#### B. Full-Stack Deployment
-For organizations requiring server-side features:
+## Environment Variables
 
-1. Build the application:
-```bash
-npm run build
-```
+The application works without any environment variables using local regex-based processing.
 
-2. Configure environment:
-```bash
-# Required
-PORT=5000
-NODE_ENV=production
-
-# Optional for AI features
-OPENAI_API_KEY=your_key_here
-```
-
-3. Start production server:
-```bash
-npm start
-```
-
-#### C. Docker Deployment
-1. Build the image:
-```bash
-docker build -t log-anonymizer .
-```
-
-2. Run container:
-```bash
-docker run -p 5000:5000 log-anonymizer
-```
-
-### 3. Cloud Platform Specific Instructions
-
-#### Replit (Easiest)
-1. Fork the Repl
-2. The app automatically deploys
-3. Access at your-repl-name.your-username.repl.co
-
-#### Heroku
-1. Create new app
-2. Connect your repository
-3. Add buildpack: heroku/nodejs
-4. Deploy main branch
-
-#### AWS Elastic Beanstalk
-1. Create new application
-2. Choose Node.js platform
-3. Upload source bundle
-4. Configure environment variables
-
-## Environment Configuration
-
-### Required Environment Variables
-None! The app works out of the box with local processing.
-
-### Optional Environment Variables
+Optional AI Enhancement:
 - `OPENAI_API_KEY`: Enable AI-powered detection
 - `PORT`: Override default port (5000)
 - `NODE_ENV`: Set environment (development/production)
+
+For more configuration options, see [.env.example](.env.example).
 
 ## Security Considerations
 
@@ -170,63 +123,10 @@ None! The app works out of the box with local processing.
    - Minimal external dependencies
    - All packages vetted for security
 
-## Troubleshooting
+## Contributing
 
-### Common Issues
+We welcome contributions! Please check our [Contributing Guidelines](CONTRIBUTING.md) before submitting PRs.
 
-1. Port Already in Use
-```bash
-# Change port in package.json or use environment variable
-PORT=5001 npm start
-```
+## License
 
-2. Missing Dependencies
-```bash
-# Clear npm cache and reinstall
-npm cache clean --force
-npm install
-```
-
-3. Build Errors
-```bash
-# Clean build files and rebuild
-rm -rf dist
-npm run build
-```
-
-## Support & Maintenance
-
-1. Updating Dependencies
-```bash
-npm update
-npm audit fix
-```
-
-2. Monitoring
-- Check application logs
-- Monitor memory usage
-- Watch for API rate limits if using AI features
-
-3. Backup
-- Regular backups of configuration
-- Version control for custom rules
-- Document any modifications
-
-## Performance Optimization
-
-1. Production Build
-- Minified assets
-- Tree-shaking enabled
-- Code splitting active
-
-2. Caching Strategy
-- Static assets cached
-- API responses cached when appropriate
-- Browser caching configured
-
-3. Load Times
-- Lazy loading for large components
-- Image optimization
-- Code splitting for routes
-
-Remember to check the [official documentation](docs/README.md) for detailed information about customization and advanced features.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
