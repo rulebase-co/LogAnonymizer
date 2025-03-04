@@ -19,7 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Download, Upload } from "lucide-react";
+import { Copy, Download, Upload, HelpCircle } from "lucide-react";
 
 export default function Home() {
   const { toast } = useToast();
@@ -57,12 +57,10 @@ export default function Home() {
       setIsProcessing(true);
 
       if (providerConfig.apiKey) {
-        // Use AI provider if configured
         const aiProcessed = await anonymizeWithAI(text, providerConfig);
         setProcessedContent(aiProcessed);
         setHighlightedContent(highlightPii(text, enabledTypes));
       } else {
-        // Fallback to regex-based detection
         setProcessedContent(anonymizeText(text, enabledTypes));
         setHighlightedContent(highlightPii(text, enabledTypes));
       }
@@ -125,6 +123,14 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  const handleShowDeploymentGuide = () => {
+    toast({
+      title: "Deployment Guide",
+      description: "This application can be deployed locally or in your private cloud environment. Check DEPLOYMENT.md for detailed setup instructions for local development, static site deployment, or full-stack server deployment.",
+      duration: 7000,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -134,7 +140,7 @@ export default function Home() {
             <p className="text-sm text-muted-foreground">
               Currently using: {providerConfig.apiKey ? "AI-Enhanced Detection" : "Local Regex Detection"}
               <button 
-                className="ml-2 text-primary hover:underline"
+                className="ml-2 text-primary hover:underline inline-flex items-center"
                 onClick={() => {
                   toast({
                     title: "PII Detection Modes",
@@ -142,19 +148,15 @@ export default function Home() {
                   });
                 }}
               >
+                <HelpCircle className="w-4 h-4 mr-1" />
                 Learn More
               </button>
               <span className="mx-2">•</span>
               <button 
-                className="text-primary hover:underline"
-                onClick={() => {
-                  toast({
-                    title: "Deployment Guide",
-                    description: "Check DEPLOYMENT.md in the project root for detailed instructions on deploying the app in your environment.",
-                    duration: 5000,
-                  });
-                }}
+                className="text-primary hover:underline inline-flex items-center"
+                onClick={handleShowDeploymentGuide}
               >
+                <Download className="w-4 h-4 mr-1" />
                 Deployment Guide
               </button>
             </p>
