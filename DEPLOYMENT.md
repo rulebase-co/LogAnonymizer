@@ -5,8 +5,8 @@
 
 ### 1. Local Development
 ```bash
-# Create project directory
-mkdir log-anonymizer
+# Clone the repository
+git clone <repository-url>
 cd log-anonymizer
 
 # Install dependencies
@@ -53,20 +53,19 @@ OPENAI_API_KEY=your_api_key_here  # Optional, app works without it
 
 ## Platform-Specific Guides
 
-### Local Deployment
-1. Create the project directory
-2. Install dependencies
-3. Configure environment variables if needed
-4. Start the development server
+### Replit
+1. Fork the Repl
+2. The app deploys automatically
+3. (Optional) Add OpenAI API key in Replit Secrets
 
 ### Netlify
-1. Create a new site
+1. Connect your GitHub repository
 2. Build command: `npm run build`
 3. Publish directory: `dist/public`
 4. Deploy!
 
 ### Vercel
-1. Create new project
+1. Import your repository
 2. Framework preset: Vite
 3. Build command: `npm run build`
 4. Output directory: `dist/public`
@@ -131,7 +130,7 @@ npm install
 
 For issues and questions:
 1. Check the FAQ in README.md
-2. Open an issue in your repository
+2. Open an issue in the repository
 3. Join our community discussions
 
 Remember to review security considerations and environment setup before deploying to production.
