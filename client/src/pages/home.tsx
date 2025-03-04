@@ -129,7 +129,19 @@ export default function Home() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Log Anonymizer</h1>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold">Log Anonymizer</h1>
+            <p className="text-sm text-muted-foreground">
+              <a 
+                href="https://github.com/your-username/log-anonymizer#readme" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                View Documentation
+              </a>
+            </p>
+          </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
