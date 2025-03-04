@@ -1,7 +1,7 @@
 import type { PiiType } from "@shared/schema";
 
 // Pattern to identify agent-related text (for exclusion only)
-const AGENT_TEXT_PATTERN = /(?:Agent(?:\s*Name)?:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|ID:\s*AGT-\d+)/g;
+const AGENT_TEXT_PATTERN = /(?:Agent(?:\s*Name)?:\s*[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)|(?:ID:\s*AGT-\d+)|(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+ID:\s*AGT-\d+)/g;
 
 const PII_PATTERNS: Record<PiiType, RegExp> = {
   timestamp: /\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?|\d{4}-\d{2}-\d{2}|\w+\s+\d{1,2},\s+\d{4}/g,
@@ -11,7 +11,7 @@ const PII_PATTERNS: Record<PiiType, RegExp> = {
   ip: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
   creditCard: /\b(?:\d[ -]*?){13,16}\b/g,
   ssn: /\b\d{3}-?\d{2}-?\d{4}\b/g,
-  name: /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g,
+  name: /\b(?<!Agent\s*Name:\s*)(?<!ID:\s*AGT-\d+\s*)[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b(?!\s*ID:\s*AGT-\d+)(?!\s*AGT-\d+)/g,
   address: /\b\d+\s+[A-Za-z\s,]+(?:Avenue|Lane|Road|Boulevard|Drive|Street|Ave|Dr|Rd|Blvd|Ln|St)\.?\b/gi,
 };
 
